@@ -1,12 +1,6 @@
-############################################################################
-# <summary> CMakeLists.txt for OpenCV and CUDA. </summary>
-# <date>    2012-02-07          </date>
-# <author>  Quan Tran Minh. edit by Johannes Kast, Michael Sarahan </author>
-# <email>   quantm@unist.ac.kr  kast.jo@googlemail.com msarahan@gmail.com</email>
-############################################################################
+cmake_minimum_required(VERSION 3.9)
 
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
-project(cs344 LANGUAGES CXX CUDA)
+project(cs334-RY LANGUAGES CXX CUDA)
 
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
@@ -19,7 +13,7 @@ if(MSVC)
 endif()
 
 if(MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /MP /WX /sdl")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3 /MP /sdl")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4127") # condition is constant
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w44062")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w44191")
@@ -88,61 +82,67 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpointer-arith -Wcast-qual -Wshadow")
 endif()
 
-find_package(OpenCV REQUIRED)
-find_package(CUDA REQUIRED)
-include_directories(${CUDA_LIBRARIES})
-link_libraries(${OpenCV_LIBS} ${CUDA_LIBRARIES})
+if((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR CMAKE_COMPILER_IS_GNUCC
+    OR CMAKE_COMPILER_IS_GNUCXX)
+  if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Winline")
+  else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG")
+  endif()
+endif()
 
-set (EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin/")
+message(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
-if(CUDA_FOUND)
-  # compared to class settings, we let NVidia's FindCUDA CMake detect 
-  # whether to build x64.  We tell it to support most devices, though, 
-  # to make sure more people can easily run class code without knowing 
-  # about this compiler argument
-  set(CUDA_PROPAGATE_HOST_FLAGS OFF)
-  set(CUDA_WARNING "cross-execution-space-call")
-  set(CUDA_NVCC_FLAGS "-ccbin /usr/bin/clang;") 
-  # -gencode;arch=compute_30,code=sm_30;  
-  # -gencode;arch=compute_35,code=sm_35;
-  # -gencode;arch=compute_35,code=compute_35;
-  # -gencode;arch=compute_20,code=sm_20; 
-  # -gencode;arch=compute_11,code=sm_11; 
-  # -gencode;arch=compute_12,code=sm_12;
-  # -gencode;arch=compute_13,code=sm_13;
+set(CUDA_PROPAGATE_HOST_FLAGS OFF)
+set(CUDA_WARNING "cross-execution-space-call")
+# new flags introduced in CUDA 9
+# set(CUDA_WARNING "reorder,cross-execution-space-call,deprecated-declarations")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Werror ${CUDA_WARNING} -restrict")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_61,code=sm_61")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_52,code=sm_52")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_50,code=sm_50")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_35,code=sm_35")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_30,code=sm_30")
 
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_30,code=sm_30")
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_35,code=sm_32")
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_20,code=sm_20")
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_12,code=sm_13")
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_12,code=sm_12")
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_11,code=sm_11")
+message(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS}")
 
-  # new flags introduced in CUDA 9
-  # set(CUDA_WARNING "reorder,cross-execution-space-call,deprecated-declarations")
-  # set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Werror ${CUDA_WARNING} -restrict")
-  # set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_61,code=sm_61")
-  # set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_52,code=sm_52")
-  # set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_50,code=sm_50")
-  # set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_35,code=sm_35")
-  # set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_30,code=sm_30")
+if(NOT TARGET uninstall)
+  configure_file(
+      ${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in
+      ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+      IMMEDIATE @ONLY)
 
+  add_custom_target(uninstall
+      COMMAND ${CMAKE_COMMAND} -P
+      ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+endif()
 
-  # add -Wextra compiler flag for gcc compilations
-  if (UNIX)
-    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-Xcompiler -Wextra")
-    set(CMAKE_CXX_FLAGS "-stdlib=libstdc++")
-  endif (UNIX)
+if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
+  export(TARGETS FILE ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Targets.cmake)
+endif()
 
-  # add debugging to CUDA NVCC flags.  For NVidia's NSight tools.
-  # set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG} "-G")
+file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake
+    "include(CMakeFindDependencyMacro)\n"
+    "include(\${CMAKE_CURRENT_LIST_DIR}/${CMAKE_PROJECT_NAME}Targets.cmake)\n")
 
-  add_subdirectory (HW1)
-  add_subdirectory (HW2)
-  add_subdirectory (HW3)
-  add_subdirectory (HW4)
-  add_subdirectory (HW5)
-  add_subdirectory (HW6)
-else(CUDA_FOUND)
-  message("CUDA is not installed on this system.")
+add_subdirectory(modules)
+add_subdirectory(apps)
+add_subdirectory(doc)
+
+option(UNIT_TEST "Run unit tests" ON)
+
+if(UNIT_TEST AND (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR}))
+  add_subdirectory(unit-test)
+endif()
+
+install(FILES ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake
+        DESTINATION lib/cmake/${CMAKE_PROJECT_NAME})
+
+install(EXPORT ${CMAKE_PROJECT_NAME}Targets NAMESPACE hvr::
+        DESTINATION lib/cmake/${CMAKE_PROJECT_NAME})
+
+if(NOT TARGET install-app)
+  add_custom_target(install-app COMMAND
+                    "${CMAKE_COMMAND}" -DCMAKE_INSTALL_COMPONENT=install-app
+                    -P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
 endif()
