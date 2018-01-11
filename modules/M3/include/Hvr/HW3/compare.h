@@ -3,7 +3,7 @@
 
 #include <string>
 
-M3_DLL
+// M3_DLL
 void compareImages(std::string reference_filename,
                    std::string test_filename,
                    bool useEpsCheck,

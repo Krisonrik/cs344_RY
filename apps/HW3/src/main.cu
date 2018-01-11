@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
-#include "hvr/HW3/timer.h"
+#include "hvr/HW3/timer.cuh"
 #include "hvr/HW3/utils.h"
 
 #include "hvr/HW3/compare.h"

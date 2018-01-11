@@ -21,7 +21,7 @@ set(PROJECT_INCS
 ${PROJECT_SOURCE_DIR}/include/Hvr/HW3/compare.h
 ${PROJECT_SOURCE_DIR}/include/Hvr/HW3/loadSaveImage.h
 ${PROJECT_SOURCE_DIR}/include/Hvr/HW3/reference_calc.h
-${PROJECT_SOURCE_DIR}/include/Hvr/HW3/timer.h
+${PROJECT_SOURCE_DIR}/include/Hvr/HW3/timer.cuh
 ${PROJECT_SOURCE_DIR}/include/Hvr/HW3/utils.h
 )
 

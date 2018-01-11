@@ -1,9 +1,9 @@
 #ifndef UTILS_H__
 #define UTILS_H__
 
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include <cuda_runtime_api.h>
+//#include <cuda.h>
+//#include <cuda_runtime.h>
+//#include <cuda_runtime_api.h>
 #include <algorithm>
 #include <cassert>
 #include <cmath>
