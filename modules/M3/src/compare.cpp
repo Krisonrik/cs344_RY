@@ -1,3 +1,4 @@
+#include "Hvr/HW3/compare.h"
 #include <opencv2/opencv.hpp>
 #include "hvr/HW3/utils.h"
 

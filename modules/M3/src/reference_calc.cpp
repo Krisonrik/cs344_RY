@@ -1,3 +1,4 @@
+#include "hvr/HW3/reference_calc.h"
 #include <algorithm>
 #include <cassert>
 
