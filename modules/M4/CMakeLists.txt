@@ -7,6 +7,7 @@ if(MSVC)
   set(DLLEXPORT "__declspec(dllexport)")
   set(DISABLE "__pragma(warning(push,0))")
   set(ENABLE "__pragma(warning(pop))")
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 set(PROJECT_SRCS
@@ -39,10 +40,10 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
                           HVR_WINDOWS_ENABLE_ALL_WARNING=${ENABLE})
 
 target_compile_definitions(${PROJECT_NAME} INTERFACE
-                          M3_DLL=${DLLIMPORT})
+                          M4_DLL=${DLLIMPORT})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-                          M3_DLL=${DLLEXPORT})
+                          M4_DLL=${DLLEXPORT})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

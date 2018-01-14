@@ -220,6 +220,7 @@ static size_t templateHalfHeight;
 
 // return types are void since any internal error will be handled by quitting
 // no point in returning error codes...
+M4_DLL
 void preProcess(unsigned int** inputVals,
                 unsigned int** inputPos,
                 unsigned int** outputVals,
@@ -397,7 +398,7 @@ void preProcess(unsigned int** inputVals,
   checkCudaErrors(cudaMemset(*outputVals, 0, sizeof(unsigned int) * numElem));
   checkCudaErrors(cudaMemset(*outputPos, 0, sizeof(unsigned int) * numElem));
 }
-
+M4_DLL
 void postProcess(const unsigned int* const outputVals,
                  const unsigned int* const outputPos,
                  const size_t numElems,

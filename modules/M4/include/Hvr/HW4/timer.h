@@ -39,4 +39,4 @@ struct GpuTimer
   }
 };
 
-#endif  /* GPU_TIMER_H__ */
+#endif /* GPU_TIMER_H__ */
