@@ -1,0 +1,5 @@
+/*!
+  \addtogroup CUDASample CUDASample
+
+  The \b CUDASample modules contains a minimal C++/CUDA class
+*/
